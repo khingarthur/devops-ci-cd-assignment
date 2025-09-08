@@ -41,7 +41,7 @@ jobs:
         # You must create these secrets in your GitHub repository settings.
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: khingarthur
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build Docker Image
