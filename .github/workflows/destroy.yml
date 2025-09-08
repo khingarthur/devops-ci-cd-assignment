@@ -20,7 +20,7 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve -input=false
+        run: terraform destroy -auto-approve -input=false -var="key_name=" -var="docker_hub_username=" -var="docker_image_tag="
         working-directory: ./terraform
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
