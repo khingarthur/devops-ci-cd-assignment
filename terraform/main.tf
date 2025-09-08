@@ -105,7 +105,7 @@ resource "aws_instance" "app_server" {
   associate_public_ip_address = true
 
   # User data script to install Docker and run the application.
-  user_data = "script.sh"
+  user_data = script.sh
 
   tags = {
     Name = "hello-world-server"
