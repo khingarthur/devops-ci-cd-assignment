@@ -92,8 +92,8 @@ jobs:
           cd terraform
           terraform apply -auto-approve \
             -var="key_name='Github-actions'" \
-            -var="docker_hub_username=khingarthur" \
-            -var="docker_image_tag=${{ needs.build_and_push.outputs.IMAGE_TAG }}"
+            -var="docker_hub_username='khingarthur'" \
+            -var="docker_image_tag='${{ needs.build_and_push.outputs.IMAGE_TAG }}'"
         env:
           # Pass AWS credentials as environment variables for the Terraform command.
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
