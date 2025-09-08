@@ -89,6 +89,7 @@ jobs:
       - name: Terraform Apply
         # Apply the Terraform configuration to provision the AWS infrastructure.
         run: |
+          cd terraform
           terraform apply -auto-approve \
             -var="key_name='Github-actions'" \
             -var="docker_hub_username=khingarthur" \
