@@ -1,5 +1,9 @@
+# This workflow automates the CI/CD process for a web application.
+# It builds a Docker image, pushes it to Docker Hub, and then uses Terraform to deploy and destroy resources on AWS.
+
 name: CI/CD Pipeline with Terraform Deployment
 
+# The workflow is triggered automatically on a push to the 'main' branch
 on:
   push:
     branches:
@@ -10,32 +14,39 @@ jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      #Checkout the repository's code.
+      - name: Checkout Repository 
         uses: actions/checkout@v4
 
+      #Set up Python environment.
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pip'
 
+      #Install dependencies.
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
+      #Run a static analysis security scan.   
       - name: Code Scanning (Security)
         run: |
           pip install bandit
           bandit -r .
 
+      #Log in to Docker Hub.
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: khingarthur
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      #Build and tag the Docker image.
       - name: Build and Tag Docker Image
         run: docker build -t khingarthur/hello-world-app:latest .
 
+      #Run a vulnerability scan on the Docker image.
       - name: Image Scanning (Vulnerability)
         uses: aquasecurity/trivy-action@master
         with:
@@ -46,9 +57,11 @@ jobs:
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
 
+      #Push the Docker image to Docker Hub.
       - name: Push Docker Image
         run: docker push khingarthur/hello-world-app:latest
 
+  # Deploy infrastructure using Terraform.
   terraform_deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
@@ -65,6 +78,8 @@ jobs:
         id: init
         run: terraform init
         working-directory: ./terraform
+
+        # The AWS credentials are passed securely as environment variables from GitHub secrets.
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -87,10 +102,11 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
-        
+        # Wait for 5 minutes to allow for manual verification of the deployment
       - name: Wait for 5 minutes
         run: sleep 300
         
+        # Terraform destroy to clean up resources.
       - name: Terraform Destroy
         id: destroy
         run: terraform destroy -auto-approve -input=false
