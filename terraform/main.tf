@@ -14,6 +14,22 @@ provider "aws" {
   region = "us-east-2"
 }
 
+# Declare variables to be used in the configuration.
+variable "key_name" {
+  description = "The name of the EC2 key pair."
+  type        = string
+}
+
+variable "docker_hub_username" {
+  description = "The Docker Hub username."
+  type        = string
+}
+
+variable "docker_image_tag" {
+  description = "The tag of the Docker image to deploy."
+  type        = string
+}
+
 # Create a new VPC for our environment.
 resource "aws_vpc" "app_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -70,7 +86,7 @@ resource "aws_security_group" "app_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # WARNING: This is for demonstration. Restrict to your IP in a real scenario.
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Ingress rule for the Flask app.
@@ -78,7 +94,7 @@ resource "aws_security_group" "app_sg" {
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # WARNING: This is for demonstration.
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Egress rule to allow all outbound traffic.
@@ -96,11 +112,9 @@ resource "aws_security_group" "app_sg" {
 
 # Create the EC2 instance.
 resource "aws_instance" "app_server" {
-  # This AMI is for Ubuntu Server 22.04 LTS (HVM) in us-east-1.
-  # Check for the latest AMI ID for your specific region and OS.
-  ami           = "ami-053b04d4111352e82"
+  ami           = "ami-0cfde0ea8edd312d4"
   instance_type = "t2.micro"
-  key_name      = "your-ec2-key-name"
+  key_name      = var.key_name
   vpc_security_group_ids = [aws_security_group.app_sg.id]
   subnet_id     = aws_subnet.app_subnet.id
   associate_public_ip_address = true
@@ -114,7 +128,7 @@ resource "aws_instance" "app_server" {
               sudo systemctl enable docker
               
               # Pull and run the Docker image from Docker Hub.
-              sudo docker run -d -p 5000:5000 --name hello-app khingarthur/hello-world-app:latest
+              sudo docker run -d -p 5000:5000 --name hello-app ${var.docker_hub_username}/hello-world-app:${var.docker_image_tag}
               EOF
 
   tags = {
