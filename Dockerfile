@@ -12,8 +12,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install the dependencies.
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip uninstall -y setuptools && \
+    pip install --no-cache-dir --upgrade -r requirements.txt
     
 # Stage 2: The Production Stage
 
