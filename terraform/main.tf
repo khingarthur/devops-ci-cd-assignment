@@ -14,7 +14,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-
 # Create a new VPC for our environment.
 resource "aws_vpc" "app_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -34,8 +33,8 @@ resource "aws_internet_gateway" "app_igw" {
 
 # Create a public subnet.
 resource "aws_subnet" "app_subnet" {
-  vpc_id     = aws_vpc.app_vpc.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id             = aws_vpc.app_vpc.id
+  cidr_block         = "10.0.1.0/24"
   map_public_ip_on_launch = true
   tags = {
     Name = "app-public-subnet"
@@ -97,15 +96,15 @@ resource "aws_security_group" "app_sg" {
 
 # Create the EC2 instance.
 resource "aws_instance" "app_server" {
-  ami           = "ami-0cfde0ea8edd312d4"
+  ami         = "ami-0cfde0ea8edd312d4"
   instance_type = "t2.micro"
-  key_name      = "Github-actions"
+  key_name    = "Github-actions"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
-  subnet_id     = aws_subnet.app_subnet.id
+  subnet_id   = aws_subnet.app_subnet.id
   associate_public_ip_address = true
 
-  # User data script to install Docker and run the application.
-  user_data = "script.sh"
+  # Use the external script.sh file for user data.
+  user_data = file("script.sh")
 
   tags = {
     Name = "hello-world-server"
