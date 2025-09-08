@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
     # Return the "Hello, World!" string when the root URL is accessed.
-    return "Hello, World! I'm Arthur!"
+    return "Hello, World! I'm Arthur!!"
 
 # The entry point of the application.
 if __name__ == '__main__':
