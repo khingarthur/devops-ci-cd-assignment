@@ -128,6 +128,7 @@ resource "aws_instance" "app_server" {
               sudo systemctl enable docker
               
               # Pull and run the Docker image from Docker Hub.
+              sudo usermod -aG docker ubuntu
               sudo docker run -d -p 5000:5000 --name hello-app ${var.docker_hub_username}/hello-world-app:${var.docker_image_tag}
               EOF
 
