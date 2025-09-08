@@ -34,4 +34,4 @@ COPY . .
 EXPOSE 5000
 
 # The command to run the application.
-CMD ["flask", "run", "--host=0.0.0.0"] #nosec B104
+CMD ["flask", "run", "--host=0.0.0.0"]
