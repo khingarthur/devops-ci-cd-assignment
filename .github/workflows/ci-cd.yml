@@ -92,9 +92,9 @@ jobs:
         id: apply
         run: |
           terraform apply -auto-approve \
-            -var="key_name='Github-actions'" \
-            -var="docker_hub_username='khingarthur'" \
-            -var="docker_image_tag='${{ needs.build_and_push.outputs.IMAGE_TAG }}'"
+            -var="key_name=Github-actions" \
+            -var="docker_hub_username=khingarthur" \
+            -var="docker_image_tag=${{ needs.build_and_push.outputs.IMAGE_TAG }}"
         working-directory: ./terraform
         
         env:
