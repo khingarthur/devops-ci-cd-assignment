@@ -1,8 +1,5 @@
-
-# The Build Stage
-
-# # Use an official Python runtime as a parent image. where we will
-# build and package our application dependencies.
+# Stage 1: The Build Stage
+# Use an official Python runtime as a parent image.
 FROM python:3.10-slim AS builder
 
 # Set the working directory for this stage.
@@ -11,24 +8,25 @@ WORKDIR /app
 # Copy the requirements file into the container.
 COPY requirements.txt .
 
-# Install the dependencies.
+# Upgrade pip, then uninstall the old setuptools, and install the new requirements.
+# This ensures only the secure version is present in the final image.
 RUN pip install --no-cache-dir --upgrade pip && \
     pip uninstall -y setuptools && \
     pip install --no-cache-dir -r requirements.txt
+    
 # Stage 2: The Production Stage
+# Use an ultra-minimal base image.
+FROM alpine:3.18 as final
 
-# Use an official Python runtime as a parent image.
-FROM python:3.10-slim
-
-# Set the working directory.
-WORKDIR /app
-
-# Copy the installed dependencies from the builder stage.
-# This ensures we only include the necessary libraries and nothing else.
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+# Copy the Python runtime and our installed dependencies from the builder stage.
+# This ensures a clean slate, with only the necessary components.
+COPY --from=builder /usr/local /usr/local
 
 # Copy the application code from the local directory into the container.
 COPY . .
+
+# Set the working directory for our application.
+WORKDIR /app
 
 # Expose the port our application will be running on.
 EXPOSE 5000
